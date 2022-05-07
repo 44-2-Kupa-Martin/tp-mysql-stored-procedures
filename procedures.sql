@@ -1,10 +1,9 @@
-USE test;
-DROP PROCEDURE IF EXISTS division;
+DROP PROCEDURE IF EXISTS usp_division;
 
 DELIMITER $$
 
-CREATE PROCEDURE division(IN a DECIMAL(65, 10), IN b DECIMAL(65, 10))
-BEGIN
+CREATE PROCEDURE usp_Division(IN a DECIMAL(65, 10), IN b DECIMAL(65, 10))
+main:BEGIN
     IF (a IS NULL) THEN
         SELECT "Invalid input";
 	ELSEIF (b IS NULL) THEN
@@ -14,16 +13,16 @@ BEGIN
     ELSE
     	SELECT a/b AS 'result';
     END IF;
-END$$
+END main$$
 
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS trapezoid_area;
+DROP PROCEDURE IF EXISTS usp_TrapezoidArea;
 
 DELIMITER $$
 
-CREATE PROCEDURE trapezoid_area(IN a DECIMAL(65, 10), b DECIMAL(65, 10), h DECIMAL(65,10))
-BEGIN
+CREATE PROCEDURE usp_TrapezoidArea(IN a DECIMAL(65, 10), b DECIMAL(65, 10), h DECIMAL(65,10))
+main:BEGIN
     IF a IS NULL THEN
         SELECT 'Invalid inputs' AS 'Err';
     ELSEIF b IS NULL THEN
@@ -33,7 +32,7 @@ BEGIN
     ELSE
         SELECT ((a+b)*h/2) AS 'result';    
     END IF;
-END$$
+END main$$
 
 DELIMITER ;
 
@@ -47,32 +46,28 @@ END //
 
 DELIMITER ;
 
-CALL search_by_date ("2010/08/01");
-
-DROP PROCEDURE IF EXISTS search_by_surname;
+DROP PROCEDURE IF EXISTS usp_SearchBySurname;
 
 DELIMITER $$
 
-CREATE PROCEDURE search_by_surname(IN surname VARCHAR(50))
-BEGIN
+CREATE PROCEDURE usp_SearchBySurname(IN surname VARCHAR(50))
+main:BEGIN
     DECLARE string_query VARCHAR(50) DEFAULT '%';
     IF surname NOT LIKE '' THEN
         SET string_query = CONCAT('%', surname, '%');
     END IF;
     SELECT * FROM clientes WHERE (apellido1 LIKE string_query) OR (apellido2 LIKE string_query);
-END$$
+END main$$
 
 DELIMITER ;
 
-CALL search_by_surname('muoz');
-
-DROP PROCEDURE IF EXISTS calculator;
+DROP PROCEDURE IF EXISTS usp_Calculator;
 
 DELIMITER $$
 
-CREATE PROCEDURE calculator(IN a DECIMAL(65, 10), b DECIMAL(65, 10), operand VARCHAR(3))
+CREATE PROCEDURE usp_Calculator(IN a DECIMAL(65, 10), b DECIMAL(65, 10), operand VARCHAR(3))
 main:BEGIN
-    IF (a IS NULL) OR (b IS NULL) OR (operand LIKE '') THEN
+    IF (a IS NULL) OR (b IS NULL) OR (operand LIKE '') OR (operand LIKE "%'%") THEN
         SELECT 'Invalid Input';
         LEAVE main;
     END IF;
@@ -90,3 +85,56 @@ main:BEGIN
     EXECUTE dynamic_stmt;
     DEALLOCATE PREPARE dynamic_stmt;
 END main$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS usp_NewClient;
+DELIMITER $$
+CREATE PROCEDURE usp_NewClient(
+    IN codigo INT(11),
+    IN nif CHAR(12),
+    IN nombre CHAR(50),
+    IN apellido1 CHAR(50),
+    IN apellido2 CHAR(50),
+    IN telefono CHAR(12),
+    IN calle CHAR(100),
+    IN numero CHAR(4),
+    IN letra CHAR(1),
+    IN piso CHAR(3),
+    IN puerta CHAR(2),
+    IN observaciones VARCHAR(200),
+    IN localidades CHAR(3)
+)
+main:BEGIN
+    IF (
+        CASE
+            WHEN (codigo IS NULL)    OR (codigo = '')    THEN 1
+            WHEN (nif IS NULL)       OR (nif = '')       THEN 1
+            WHEN (nombre IS NULL)    OR (nombre = '')    THEN 1
+            WHEN (apellido1 IS NULL) OR (apellido1 = '') THEN 1
+            WHEN (telefono IS NULL)  OR (telefono = '')  THEN 1
+            WHEN (calle IS NULL)     OR (calle = '')     THEN 1
+            WHEN (numero IS NULL)    OR (numero = '')    THEN 1
+            WHEN (localidades IS NULL) OR (localidades = '') THEN 1
+            ELSE 0
+        END
+    ) THEN
+        SELECT 'Invalid input';
+        LEAVE main;
+    END IF;
+    INSERT INTO clientes VALUES (codigo, nif, nombre, apellido1, apellido2, telefono, calle, numero, letra, piso, puerta, observaciones, localidades);
+END main$$
+
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS usp_SearchByZone;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_SearchByZone(IN a CHAR(3))
+main:BEGIN
+    SELECT * FROM clientes WHERE localidades LIKE a;
+END main$$
+
+DELIMITER ;
+
