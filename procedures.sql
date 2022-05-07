@@ -64,5 +64,29 @@ END$$
 
 DELIMITER ;
 
-
 CALL search_by_surname('muoz');
+
+DROP PROCEDURE IF EXISTS calculator;
+
+DELIMITER $$
+
+CREATE PROCEDURE calculator(IN a DECIMAL(65, 10), b DECIMAL(65, 10), operand VARCHAR(3))
+main:BEGIN
+    IF (a IS NULL) OR (b IS NULL) OR (operand LIKE '') THEN
+        SELECT 'Invalid Input';
+        LEAVE main;
+    END IF;
+    PREPARE dynamic_stmt FROM CONCAT(
+    "SELECT
+        (CASE
+            WHEN '", operand, "' LIKE 'ADD' THEN ", a, "+", b,"
+            WHEN '", operand, "' LIKE 'SUB' THEN ", a, "-", b,"
+            WHEN '", operand, "' LIKE 'MUL' THEN ", a, "*", b,"
+            WHEN '", operand, "' LIKE 'DIV' THEN ", a, "/", b,"
+            WHEN '", operand, "' LIKE 'POW' THEN POW(", a, ",", b, ")
+            ELSE 'Invalid operand'
+        END)
+    AS '", operand, "';");
+    EXECUTE dynamic_stmt;
+    DEALLOCATE PREPARE dynamic_stmt;
+END main$$
