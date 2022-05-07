@@ -18,24 +18,6 @@ END$$
 
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS test;
-
-DELIMITER $$
-
-CREATE PROCEDURE test()
-BEGIN
-    IF @num1 IS NULL THEN
-        SET @num1 = 0;
-    END IF;
-    IF @num2 IS NULL THEN
-        SET @num2 = 1;
-    END IF;
-    SET @num1 = @num1 + @num2;
-    SELECT @num1;
-END$$
-
-DELIMITER ;
-
 DROP PROCEDURE IF EXISTS trapezoid_area;
 
 DELIMITER $$
