@@ -145,4 +145,39 @@ END main$$
 DELIMITER ;
 
 -- ej 8
-DROP PROCEDURE usp_FormerEmployee;
+DROP PROCEDURE IF EXISTS usp_FormerEmployees;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_FormerEmployees(IN unemploymentDate DATE)
+main:BEGIN
+    SELECT * FROM personal WHERE personal.FechaBaja >= unemploymentDate;
+END main$$
+
+DELIMITER ;
+
+-- ej 10
+
+DROP PROCEDURE IF EXISTS usp_PriceUp;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_PriceUp()
+main:BEGIN
+    UPDATE bases SET importe= importe*1.2;
+END main$$
+
+DELIMITER ;
+
+-- ej 12
+
+DROP PROCEDURE IF EXISTS usp_TodaysRequest;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_TodaysRequest()
+main:BEGIN
+    SELECT pedidos.codigo, estados.descripcion FROM pedidos LEFT JOIN estados ON pedidos.estado = estados.codigo WHERE DATE(pedidos.FechaHoraPedido) = CURRENT_DATE();
+END main$$
+
+DELIMITER ;
