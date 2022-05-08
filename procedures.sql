@@ -36,6 +36,34 @@ END main$$
 
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS usp_Calculator;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_Calculator(IN a DECIMAL(65, 10), b DECIMAL(65, 10), operand VARCHAR(255))
+main:BEGIN
+    DECLARE result DECIMAL(65, 10);
+    IF (a IS NULL) OR (b IS NULL) OR (operand LIKE '') OR (operand LIKE "%'%") THEN
+        SELECT 'Invalid Input';
+        LEAVE main;
+    END IF;
+    SET result= (
+        CASE
+            WHEN (operand LIKE 'ADD') THEN a+b
+            WHEN (operand LIKE 'SUB') THEN a-b
+            WHEN (operand LIKE 'MUL') THEN a*b
+            WHEN (operand LIKE 'DIV') THEN a/b
+            WHEN (operand LIKE 'POW') THEN POW(a,b)
+        END
+    );
+    PREPARE dynamic_stmt FROM CONCAT("SELECT IFNULL(?, 'Invalid input') AS '", operand, "';");
+    EXECUTE dynamic_stmt USING result;
+    DEALLOCATE PREPARE dynamic_stmt;
+END main$$
+
+DELIMITER ;
+
+-- ej1 (winter)
 DROP PROCEDURE IF EXISTS search_by_date;
 
 DELIMITER //
@@ -46,6 +74,7 @@ END //
 
 DELIMITER ;
 
+-- ej2 (kupa)
 DROP PROCEDURE IF EXISTS usp_SearchBySurname;
 
 DELIMITER $$
@@ -61,35 +90,11 @@ END main$$
 
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS usp_Calculator;
-
-DELIMITER $$
-
-CREATE PROCEDURE usp_Calculator(IN a DECIMAL(65, 10), b DECIMAL(65, 10), operand VARCHAR(3))
-main:BEGIN
-    IF (a IS NULL) OR (b IS NULL) OR (operand LIKE '') OR (operand LIKE "%'%") THEN
-        SELECT 'Invalid Input';
-        LEAVE main;
-    END IF;
-    PREPARE dynamic_stmt FROM CONCAT(
-    "SELECT
-        (CASE
-            WHEN '", operand, "' LIKE 'ADD' THEN ", a, "+", b,"
-            WHEN '", operand, "' LIKE 'SUB' THEN ", a, "-", b,"
-            WHEN '", operand, "' LIKE 'MUL' THEN ", a, "*", b,"
-            WHEN '", operand, "' LIKE 'DIV' THEN ", a, "/", b,"
-            WHEN '", operand, "' LIKE 'POW' THEN POW(", a, ",", b, ")
-            ELSE 'Invalid operand'
-        END)
-    AS '", operand, "';");
-    EXECUTE dynamic_stmt;
-    DEALLOCATE PREPARE dynamic_stmt;
-END main$$
-
-DELIMITER ;
-
+-- ej4
 DROP PROCEDURE IF EXISTS usp_NewClient;
+
 DELIMITER $$
+
 CREATE PROCEDURE usp_NewClient(
     IN codigo INT(11),
     IN nif CHAR(12),
@@ -127,6 +132,7 @@ END main$$
 
 DELIMITER ;
 
+-- ej 6
 DROP PROCEDURE IF EXISTS usp_SearchByZone;
 
 DELIMITER $$
@@ -138,3 +144,5 @@ END main$$
 
 DELIMITER ;
 
+-- ej 8
+DROP PROCEDURE usp_FormerEmployee;
