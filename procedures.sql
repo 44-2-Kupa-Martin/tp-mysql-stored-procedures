@@ -181,3 +181,73 @@ main:BEGIN
 END main$$
 
 DELIMITER ;
+
+-- ej 14
+
+DROP PROCEDURE IF EXISTS usp_SuccessfulRequests;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_SuccessfulRequests()
+main:BEGIN
+    SELECT * FROM pedidos WHERE pedidos.estado LIKE 'ENT' ORDER BY pedidos.estado ASC;
+END main$$
+
+DELIMITER ;
+
+-- ej 16
+
+DROP PROCEDURE IF EXISTS usp_ClearUnsuccessfulRequests;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_ClearUnsuccessfulRequests(IN clearBefore DATE)
+main:BEGIN
+    IF (clearBefore IS NULL) THEN 
+        SELECT 'Invalid input';
+        LEAVE main;
+    END IF;
+    DELETE FROM pedidos WHERE pedidos.estado IN ('CAN', 'PEN') AND pedidos.FechaHoraPedido < clearBefore;
+END main$$
+
+DELIMITER ;
+
+-- ej 18
+
+DROP PROCEDURE IF EXISTS usp_ViewPendingRequests;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_ViewPendingRequests(IN viewBefore DATE)
+main:BEGIN
+    IF (clearBefore IS NULL) THEN 
+        SELECT 'Invalid input';
+        LEAVE main;
+    END IF;
+        SELECT * FROM pedidos WHERE pedidos.estado LIKE 'PEN' AND pedidos.FechaHoraPedido < viewBefore;
+END main$$
+
+DELIMITER ;
+
+-- ej20
+
+DROP PROCEDURE IF EXISTS usp_ComputeRequestCost;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_ComputeRequestCost(IN requestId INT)
+main:BEGIN
+    DECLARE paymentMethod VARCHAR(3);
+    IF (requestId IS NULL) THEN
+        SELECT 'Invalid input';
+        LEAVE main;
+    END IF;
+    SET paymentMethod= (SELECT pago FROM pedidos WHERE pedidos.codigo = requestId);
+    IF (paymentMethod LIKE 'EFE') THEN
+        SELECT (importe*0.9) AS 'Bonificacion' FROM pedidos WHERE pedidos.codigo = requestId;
+    ELSE
+        SELECT (importe*1.05) AS 'Recargo' FROM pedidos WHERE pedidos.codigo = requestId;
+    END IF; 
+END main$$
+
+DELIMITER ;
