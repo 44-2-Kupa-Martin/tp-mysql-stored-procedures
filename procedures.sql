@@ -90,6 +90,22 @@ END main$$
 
 DELIMITER ;
 
+-- ej3
+
+DROP PROCEDURE IF EXISTS usp_SearchByTel;
+
+DELIMITER $$
+CREATE PROCEDURE usp_SearchByTel(IN tel VARCHAR(12))
+main:BEGIN
+    IF (tel IS NULL) OR tel LIKE '' THEN
+        SELECT 'Invalid input';
+        LEAVE main;
+    END IF
+    SELECT * FROM clientes WHERE clientes.telefono LIKE tel;
+END main$$
+
+DELIMITER ;
+
 -- ej4
 DROP PROCEDURE IF EXISTS usp_NewClient;
 
@@ -131,6 +147,21 @@ main:BEGIN
 END main$$
 
 DELIMITER ;
+
+-- ej5
+
+DROP PROCEDURE IF EXISTS usp_EmployeesInZone;
+
+DELIMITER $$
+
+CREATE PROCEDURE usp_EmployeesInZone(IN locality VARCHAR(3))
+main:BEGIN
+    IF (locality IS NULL) OR locality LIKE '' THEN
+        SELECT 'Invalid input';
+        LEAVE main;
+    END IF
+    SELECT COUNT(personal.codigo) AS employees FROM personal WHERE personal.localidad LIKE locality;
+END main$$
 
 -- ej 6
 DROP PROCEDURE IF EXISTS usp_SearchByZone;
